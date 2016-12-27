@@ -277,9 +277,11 @@ var $table = $('#table'),
         var scripts = [
                 location.search.substring(1) || 'assets/bootstrap-table/src/bootstrap-table.js',
                 'assets/bootstrap-table/src/extensions/export/bootstrap-table-export.js',
-                'http://rawgit.com/hhurz/tableExport.jquery.plugin/master/tableExport.js',
+//                'http://rawgit.com/hhurz/tableExport.jquery.plugin/master/tableExport.js',
+                'assets/bootstrap-table/src/extensions/export/tableExport.js',
                 'assets/bootstrap-table/src/extensions/editable/bootstrap-table-editable.js',
-                'http://rawgit.com/vitalets/x-editable/master/dist/bootstrap3-editable/js/bootstrap-editable.js'
+//                'http://rawgit.com/vitalets/x-editable/master/dist/bootstrap3-editable/js/bootstrap-editable.js'
+                'assets/bootstrap-table/src/extensions/editable/bootstrap-editable.js'
             ],
             eachSeries = function (arr, iterator, callback) {
                 callback = callback || function () {};
