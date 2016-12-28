@@ -15,7 +15,7 @@ var $table = $('#table'),
                         valign: 'middle'
                     }, {
                         title: '用户 ID',
-                        field: 'id',
+                        field: '_id',
                         rowspan: 2,
                         align: 'center',
                         valign: 'middle',

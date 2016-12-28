@@ -21,6 +21,11 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+//处理表单及文件上传的中间件
+app.use(require('express-formidable')({
+	  uploadDir: path.join(__dirname, 'public/images'),// 上传文件目录
+	  keepExtensions: true// 保留后缀
+	}));
 
 //路由配置
 routes(app);
