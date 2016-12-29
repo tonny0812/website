@@ -254,11 +254,43 @@ var $table = $('#table'),
     window.operateEvents = {
         'click .save': function (e, value, row, index) {
             alert('You click like action, row: ' + JSON.stringify(row));
+            $.ajax({
+            	type:"post",
+            	url:"/update",
+            	contentType : "application/json; charset=utf-8",
+            	dataType : "json",
+            	data : {
+					user : JSON.stringify(row)
+				},
+            	async:true,
+            	success : function(data) {
+				},
+				error : function(err) {
+					console.log(err);
+				}
+            });
         },
         'click .remove': function (e, value, row, index) {
-            $table.bootstrapTable('remove', {
-                field: 'id',
-                values: [row.id]
+            $.ajax({
+            	type:"post",
+            	url:"/delete",
+            	contentType : "application/json; charset=utf-8",
+            	dataType : "json",
+            	data : {
+					userId : row._id
+				},
+            	async:true,
+            	success : function(flag) {
+            		if(flag) {
+						$table.bootstrapTable('remove', {
+							field: '_id',
+						    values: [row._id]
+						});
+            		}
+				},
+				error : function(err) {
+					console.log(err);
+				}
             });
         }
     };

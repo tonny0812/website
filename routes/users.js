@@ -13,7 +13,6 @@ router.get('/create', function(req, res, next){
 
 // 创建一个用户
 router.post('/create', function(req, res, next) {
-	console.log(req.fields)
 	 var name = req.fields.name;
 	 var passwd = req.fields.passwd;
 	 var minute1 = req.fields.minute1;
@@ -33,6 +32,17 @@ router.post('/create', function(req, res, next) {
 		  if (err) return console.error(err);
 		  res.redirect('/users');
 	});
+});
+
+//更新一个用户信息
+router.post('/update', function(req, res, next)) {
+	 var user = req.fields.user;
+	 console.log(user);
+});
+
+// 删除一个用户
+router.post('/delete', function(req, res, next)) {
+	
 });
 
 // 获取用户信息
