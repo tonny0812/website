@@ -2,7 +2,6 @@ var $table = $('#table'),
         $remove = $('#remove'),
         selections = [];
     function initTable() {
-    	console.log('ss')
         $table.bootstrapTable({
             height: getHeight(),
             columns: [
@@ -192,7 +191,7 @@ var $table = $('#table'),
             }
         });
         $table.on('all.bs.table', function (e, name, args) {
-            console.log(name, args);
+      //      console.log(name, args);
         });
         $table.on('editable-hidden.bs.table', function (e, name, args) {
             $table.bootstrapTable('resetView');
@@ -253,33 +252,24 @@ var $table = $('#table'),
 
     window.operateEvents = {
         'click .save': function (e, value, row, index) {
-            alert('You click like action, row: ' + JSON.stringify(row));
-            $.ajax({
-            	type:"post",
-            	url:"/update",
-            	contentType : "application/json; charset=utf-8",
-            	dataType : "json",
-            	data : {
-					user : JSON.stringify(row)
-				},
-            	async:true,
-            	success : function(data) {
-				},
-				error : function(err) {
-					console.log(err);
-				}
-            });
+        	$.ajax({
+        		type:"POST",
+        		url:"/users/update/"+JSON.stringify(row),
+	    		timeout: 3000,
+        		success:function(flag){
+        			if(flag) {
+        				console.log('update seccess~')
+        			}
+        		},
+        		error: function (err) {
+                	console.log(err)
+                }
+        	});
         },
         'click .remove': function (e, value, row, index) {
             $.ajax({
-            	type:"post",
-            	url:"/delete",
-            	contentType : "application/json; charset=utf-8",
-            	dataType : "json",
-            	data : {
-					userId : row._id
-				},
-            	async:true,
+            	type:"POST",
+            	url:"/users/delete/"+row._id,
             	success : function(flag) {
             		if(flag) {
 						$table.bootstrapTable('remove', {
