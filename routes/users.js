@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var Account = require('../lib/mongo').Account;
+var kaoQinTest = require('../controller/login').kaoQin.test;
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -16,17 +17,13 @@ router.post('/create', function(req, res, next) {
 	 var name = req.fields.name;
 	 var passwd = req.fields.passwd;
 	 var minute1 = req.fields.minute1;
-	 var second1 = req.fields.second2;
 	 var minute2 = req.fields.minute2;
-	 var second2 = req.fields.second2;
 	 
 	 var account = new Account({
 			name: name,
 			passwd: passwd,
 			minute1: minute1,
-			second1: second1,
 			minute2: minute2,
-			second2: second2
 		 });
 	 account.save(function (err, account) {
 		  if (err) return console.error(err);
@@ -38,17 +35,15 @@ router.post('/create', function(req, res, next) {
 router.post('/update/:row', function(req, res, next) {
 	 var row = JSON.parse(req.params.row);
 	 Account.findById(row._id,function(err,account){
-		 account.name = row.name;
-		 account.passwd = row.passwd;
-		 account.minute1 = row.minute1;
-		 account.second1 = row.second1;
-		 account.minute2 = row.minute2;
-		 account.second2 = row.second2;
+	 	 var udpateAccount = {}; 
+		 udpateAccount.name = row.name;
+		 udpateAccount.passwd = row.passwd;
+		 udpateAccount.minute1 = row.minute1;
+		 udpateAccount.minute2 = row.minute2;
 	     var _id = account._id; //需要取出主键_id
-	     delete account._id;    //再将其删除
-	     delete account.data;
-	     Account.update({_id:_id}, account, function(err){
+	     Account.update({_id:_id}, udpateAccount, function(err){
 	    	  if(err) {
+	    	  	  console.log(err)
 	    		  res.send(false);
 	    	  } else {
 	    		  res.send(true);
@@ -74,13 +69,21 @@ router.post('/delete/:id', function(req, res, next) {
 router.get('/data', function(req, res, next) {
 	Account.find(function(err, accounts) {
 		if (err) return console.error(err);
-	 	console.log(accounts)
 	 	var data = {
 			"total": accounts.length,
 			"rows": accounts
 	 	}
 	 	res.send(data);
 	});
+});
+
+// 考勤打卡测试
+router.post('/test/:userinfo', function(req, res, next){
+	var userinfo = req.params.userinfo;
+	console.log(userinfo)
+	userinfo = JSON.parse(userinfo);
+	kaoQinTest(userinfo);
+	res.send(true);
 });
 
 module.exports = router;

@@ -7,6 +7,10 @@ var bodyParser = require('body-parser');
 
 var routes = require('./routes');
 
+var kaoQingStart = require('./controller/login').kaoQin.start;
+//考勤启动
+kaoQingStart();
+
 var app = express();
 
 // view engine setup

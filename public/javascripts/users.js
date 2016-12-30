@@ -18,18 +18,18 @@ var $table = $('#table'),
                         rowspan: 2,
                         align: 'center',
                         valign: 'middle',
-                        sortable: true
+                        visible : false,
                     }, {
                         title: '用户信息',
                         colspan: 3,
                         align: 'center'
                     }, {
                         title: '第一次打卡时间',
-                        colspan: 2,
+                        colspan: 1,
                         align: 'center'
                     }, {
                         title: '第二次打卡时间',
-                        colspan: 2,
+                        colspan: 1,
                         align: 'center'
                     }, {
                         title: '操作',
@@ -103,25 +103,6 @@ var $table = $('#table'),
                             }
                         },
                     }, {
-                        field: 'second1',
-                        title: '秒',
-                        align: 'center',
-                        editable: {
-                            type: 'text',
-                            min: 1,
-                            max: 59,
-                            validate: function (value) {
-                                value = $.trim(value);
-                                if (!value) {
-                                    return 'This field is required';
-                                }
-                                var data = $table.bootstrapTable('getData'),
-                                    index = $(this).parents('tr').data('index');
-                                console.log(data[index]);
-                                return '';
-                            }
-                        },
-                    }, {
                         field: 'minute2',
                         title: '分',
                         align: 'center',
@@ -140,25 +121,6 @@ var $table = $('#table'),
                                 	} else {
                                 		return '重新输入';
                                 	}
-                                }
-                                var data = $table.bootstrapTable('getData'),
-                                    index = $(this).parents('tr').data('index');
-                                console.log(data[index]);
-                                return '';
-                            }
-                        },
-                    }, {
-                        field: 'second2',
-                        title: '秒',
-                        align: 'center',
-                        editable: {
-                            type: 'text',
-                            validate: function (value) {
-                                value = $.trim(value);
-                                if (!value) {
-                                    return 'This field is required';
-                                } else if(value < 1 || value > 59) {
-                                	return '1-59';
                                 }
                                 var data = $table.bootstrapTable('getData'),
                                     index = $(this).parents('tr').data('index');
@@ -259,6 +221,10 @@ var $table = $('#table'),
         		success:function(flag){
         			if(flag) {
         				console.log('update seccess~')
+        				alert('update seccess~')
+        			} else {
+        				console.log('update err')
+        				alert('update err')
         			}
         		},
         		error: function (err) {
@@ -287,7 +253,20 @@ var $table = $('#table'),
 
 	window.testOperateEvents = {
 		'click .punch':　function(e, value, row, index) {
-            console.log('You click like action punch, row: ' + JSON.stringify(row));
+			var userinfo = {};
+			userinfo.username = row.name;
+			userinfo.passwd = row.passwd;
+			alert(JSON.stringify(userinfo))
+			$.ajax({
+            	type:"POST",
+            	url:"/users/test/"+JSON.stringify(userinfo),
+            	success : function(flag) {
+            		alert('请去考勤页面查看~')
+				},
+				error : function(err) {
+					console.log(err);
+				}
+            });
         }
 	}
 
