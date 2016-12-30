@@ -11,7 +11,8 @@ var $table = $('#table'),
                         checkbox: true,
                         rowspan: 2,
                         align: 'center',
-                        valign: 'middle'
+                        valign: 'middle',
+                        visible : false,
                     }, {
                         title: '用户 ID',
                         field: '_id',
@@ -20,15 +21,42 @@ var $table = $('#table'),
                         valign: 'middle',
                         visible : false,
                     }, {
-                        title: '用户信息',
-                        colspan: 3,
+                        field: 'name',
+                        title: '用户名',
+                        rowspan: 2,
+                        sortable: true,
+                        valign: 'middle',
                         align: 'center'
                     }, {
-                        title: '第一次打卡时间',
+                        field: 'passwd',
+                        title: '密码',
+                        rowspan: 2,
+                        align: 'center',
+                        valign: 'middle',
+                        editable: {
+                            type: 'password',
+                            validate: function (value) {
+                                value = $.trim(value);
+                                if (!value) {
+                                    return 'This field is required';
+                                }
+                                return '';
+                            }
+                        }
+                    }, {
+                        field: 'operate',
+                        title: '测试',
+                        rowspan: 2,
+                        align: 'center',
+                        valign: 'middle',
+                        events: testOperateEvents,
+                        formatter: testOperateFormatter
+                    }, {
+                        title: '第一次打卡时间（8点）',
                         colspan: 1,
                         align: 'center'
                     }, {
-                        title: '第二次打卡时间',
+                        title: '第二次打卡时间（18点）',
                         colspan: 1,
                         align: 'center'
                     }, {
@@ -43,49 +71,8 @@ var $table = $('#table'),
                 ],
                 [
                     {
-                        field: 'name',
-                        title: '用户名',
-                        sortable: true,
-                        editable: {
-                        	type: 'text',
-                        	validate: function (value) {
-                                value = $.trim(value);
-                                if (!value) {
-                                    return '不可为空';
-                                }
-                                var data = $table.bootstrapTable('getData'),
-                                    index = $(this).parents('tr').data('index');
-                                console.log(data[index]);
-                                return '';
-                            }
-                        },
-                        align: 'center'
-                    }, {
-                        field: 'passwd',
-                        title: '密码',
-                        align: 'center',
-                        editable: {
-                            type: 'password',
-                            validate: function (value) {
-                                value = $.trim(value);
-                                if (!value) {
-                                    return 'This field is required';
-                                }
-                                var data = $table.bootstrapTable('getData'),
-                                    index = $(this).parents('tr').data('index');
-                                console.log(data[index]);
-                                return '';
-                            }
-                        }
-                    }, {
-                        field: 'operate',
-                        title: '测试',
-                        align: 'center',
-                        events: testOperateEvents,
-                        formatter: testOperateFormatter
-                    }, {
                         field: 'minute1',
-                        title: '分',
+                        title: '分钟范围',
                         align: 'center',
                         editable: {
                             type: 'text',
@@ -95,16 +82,29 @@ var $table = $('#table'),
                                 value = $.trim(value);
                                 if (!value) {
                                     return 'This field is required';
+                                } else {
+                                	var arr = value.split('-');
+                                	
+                                	if(arr.length == 2) {
+                                		if(/^\d+$/.test(arr[0]) || /^\d+$/.test(arr[1])) {
+                                			return '请输入纯数字';
+                                		}
+                                		if(arr[0] > 59 || arr[0] < 1 || arr[1] > 59 || arr[1] < 1) {
+                                			return '请输入1-59之间的数字';
+                                		}
+                                		if(arr[0] > arr[1]) {
+                                			return '开始值须不大于结束值';
+                                		}
+                                	} else {
+                                		return '重新输入，如10-20';
+                                	}
                                 }
-                                var data = $table.bootstrapTable('getData'),
-                                    index = $(this).parents('tr').data('index');
-                                console.log(data[index]);
                                 return '';
                             }
                         },
                     }, {
                         field: 'minute2',
-                        title: '分',
+                        title: '分钟范围',
                         align: 'center',
                        editable: {
                             type: 'text',
@@ -115,16 +115,16 @@ var $table = $('#table'),
                                 } else {
                                 	var arr = value.split('-');
                                 	if(arr.length == 2) {
+                                		if(arr[0] > 59 || arr[0] < 1 || arr[1] > 59 || arr[1] < 1) {
+                                			return '请输入1-59之间的数字';
+                                		}
                                 		if(arr[0] > arr[1]) {
-                                			return '非法输入';
+                                			return '开始值须不大于结束值';
                                 		}
                                 	} else {
                                 		return '重新输入';
                                 	}
                                 }
-                                var data = $table.bootstrapTable('getData'),
-                                    index = $(this).parents('tr').data('index');
-                                console.log(data[index]);
                                 return '';
                             }
                         },
@@ -157,7 +157,7 @@ var $table = $('#table'),
         });
         $table.on('editable-hidden.bs.table', function (e, name, args) {
             $table.bootstrapTable('resetView');
-            console.log(name, args);
+//          console.log(name, args);
         });
         $remove.click(function () {
             var ids = getIdSelections();
@@ -256,7 +256,6 @@ var $table = $('#table'),
 			var userinfo = {};
 			userinfo.username = row.name;
 			userinfo.passwd = row.passwd;
-			alert(JSON.stringify(userinfo))
 			$.ajax({
             	type:"POST",
             	url:"/users/test/"+JSON.stringify(userinfo),
