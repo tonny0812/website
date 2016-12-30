@@ -86,7 +86,7 @@ var $table = $('#table'),
                                 	var arr = value.split('-');
                                 	
                                 	if(arr.length == 2) {
-                                		if(/^\d+$/.test(arr[0]) || /^\d+$/.test(arr[1])) {
+                                		if(!(/^\d+$/.test(arr[0]) && /^\d+$/.test(arr[1]))) {
                                 			return '请输入纯数字';
                                 		}
                                 		if(arr[0] > 59 || arr[0] < 1 || arr[1] > 59 || arr[1] < 1) {
@@ -115,6 +115,9 @@ var $table = $('#table'),
                                 } else {
                                 	var arr = value.split('-');
                                 	if(arr.length == 2) {
+                                		if(!(/^\d+$/.test(arr[0]) && /^\d+$/.test(arr[1]))) {
+                                			return '请输入纯数字';
+                                		}
                                 		if(arr[0] > 59 || arr[0] < 1 || arr[1] > 59 || arr[1] < 1) {
                                 			return '请输入1-59之间的数字';
                                 		}
