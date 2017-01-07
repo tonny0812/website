@@ -3,34 +3,28 @@ var $table = $('#table'),
         selections = [];
     function initTable() {
         $table.bootstrapTable({
-            height: getHeight(),
             columns: [
-                [
                     {
                         field: 'state',
                         checkbox: true,
-                        rowspan: 2,
                         align: 'center',
                         valign: 'middle',
                         visible : false,
                     }, {
                         title: '用户 ID',
                         field: '_id',
-                        rowspan: 2,
                         align: 'center',
                         valign: 'middle',
                         visible : false,
                     }, {
                         field: 'name',
                         title: '用户名',
-                        rowspan: 2,
                         sortable: true,
                         valign: 'middle',
                         align: 'center'
                     }, {
-                        field: 'passwd',
+                        field: 'password',
                         title: '密码',
-                        rowspan: 2,
                         align: 'center',
                         valign: 'middle',
                         editable: {
@@ -46,33 +40,14 @@ var $table = $('#table'),
                     }, {
                         field: 'operate',
                         title: '测试',
-                        rowspan: 2,
                         align: 'center',
                         valign: 'middle',
                         events: testOperateEvents,
                         formatter: testOperateFormatter
                     }, {
-                        title: '第一次打卡时间（8点）',
-                        colspan: 1,
-                        align: 'center'
-                    }, {
-                        title: '第二次打卡时间（18点）',
-                        colspan: 1,
-                        align: 'center'
-                    }, {
-                        title: '操作',
-                        field: 'operation',
-                        rowspan: 2,
+                        title: '第一次打卡时间（8点）分钟范围',
                         align: 'center',
-                        valign: 'middle',
-                        events: operateEvents,
-                        formatter: operateFormatter
-                    }
-                ],
-                [
-                    {
                         field: 'minute1',
-                        title: '分钟范围',
                         align: 'center',
                         editable: {
                             type: 'text',
@@ -101,12 +76,13 @@ var $table = $('#table'),
                                 }
                                 return '';
                             }
-                        },
+                        }
                     }, {
-                        field: 'minute2',
-                        title: '分钟范围',
+                        title: '第二次打卡时间（18点）分钟范围',
                         align: 'center',
-                       editable: {
+                        field: 'minute2',
+                        align: 'center',
+                        editable: {
                             type: 'text',
                             validate: function (value) {
                                 value = $.trim(value);
@@ -130,10 +106,23 @@ var $table = $('#table'),
                                 }
                                 return '';
                             }
-                        },
+                        }
+                    }, {
+                        field: 'active',
+                        title: '激活',
+                        align: 'center',
+                        valign: 'middle',
+                        events: activeOperateEvents,
+                        formatter: activeOperateFormatter
+                    }, {
+                        title: '操作',
+                        field: 'operation',
+                        align: 'center',
+                        valign: 'middle',
+                        events: operateEvents,
+                        formatter: operateFormatter
                     }
                 ]
-            ]
         });
         // sometimes footer render error.
         setTimeout(function () {
@@ -171,9 +160,7 @@ var $table = $('#table'),
             $remove.prop('disabled', true);
         });
         $(window).resize(function () {
-            $table.bootstrapTable('resetView', {
-                height: getHeight()
-            });
+            $table.bootstrapTable('resetView');
         });
     }
 
@@ -215,6 +202,24 @@ var $table = $('#table'),
         ].join('');
 	}
 
+	function activeOperateFormatter(value, row, index) {
+		var contents;
+		var flag = 'disabled';
+		if(window.username === 'admin') {
+			flag = '';
+		}
+		if(value) {
+			contents = ['<button class="btn btn-default btn-xs state active" title="可用" '+ flag +'>',
+						'<span class="glyphicon glyphicon-star"></span>',
+						'</button>'];
+		} else {
+			contents = ['<button class="btn btn-default btn-xs state un-active" title="不可用" '+ flag +'>',
+						'<span class="glyphicon glyphicon-star-empty"></span>',
+						'</button>'];
+		}
+		return contents.join('');
+	}
+	
     window.operateEvents = {
         'click .save': function (e, value, row, index) {
         	$.ajax({
@@ -236,21 +241,27 @@ var $table = $('#table'),
         	});
         },
         'click .remove': function (e, value, row, index) {
-            $.ajax({
-            	type:"POST",
-            	url:"/users/delete/"+row._id,
-            	success : function(flag) {
-            		if(flag) {
-						$table.bootstrapTable('remove', {
-							field: '_id',
-						    values: [row._id]
-						});
-            		}
-				},
-				error : function(err) {
-					console.log(err);
-				}
-            });
+        	if(confirm("删除用户：" + row.name + "?")) {
+        		$.ajax({
+        			type:"POST",
+        			url:"/users/delete/"+row._id,
+        			success : function(flag) {
+        				if(flag) {
+        					if(window.username === 'admin') {
+        						$table.bootstrapTable('remove', {
+        							field: '_id',
+        							values: [row._id]
+        						});
+        					} else {
+        						 window.location.reload()
+        					}
+        				}
+        			},
+        			error : function(err) {
+        				console.log(err);
+        			}
+        		});
+        	}
         }
     };
 
@@ -271,11 +282,17 @@ var $table = $('#table'),
             });
         }
 	}
-
-    function getHeight() {
-        return $(window).height() - $('h1').outerHeight(true);
-    }
-
+	
+	window.activeOperateEvents = {
+		'click .state': function(e, value, row, index) {
+			$table.bootstrapTable('updateCell', {
+				index: index,
+				field: 'active',
+				value: !value
+			});
+		}	
+	}
+	
     $(function () {
         var scripts = [
                 location.search.substring(1) || 'assets/bootstrap-table/src/bootstrap-table.js',

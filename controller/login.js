@@ -189,8 +189,10 @@ function start() {
 			if (err) return console.error(err);
 			if(accounts.length > 0) {
 				accounts.forEach(function(val,index,arr){
-					firstDaKa(val);
-					secondDaKa(val);
+					if(!!val.active) {
+						firstDaKa(val);
+						secondDaKa(val);
+					}
 				});
 			} else {
 				console.log('数据库无信息')
