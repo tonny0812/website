@@ -1,6 +1,6 @@
 module.exports = function (app) {
 
-	app.use('/', require('./home'));
+	app.use('/', require('./users'));
 	app.use('/users', require('./users'));
 	app.use('/signup', require('./signup'));
 	app.use('/signin', require('./signin'));
