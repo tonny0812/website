@@ -11,6 +11,35 @@ var Account = require('../lib/mongo').Account;
 var emitter = new events.EventEmitter();
 
 var kqUrl = 'http://192.168.2.53';
+
+var holidays = [
+               	'2017-01-01',
+               	'2017-01-02',
+				
+               	'2017-01-27',
+               	'2017-01-28',
+               	'2017-01-29',
+               	'2017-01-30',
+               	'2017-01-31',
+               	'2017-02-01',
+               	'2017-02-02',
+				
+               	'2017-04-03',
+               	'2017-04-04',
+				
+               	'2017-05-01',
+				
+               	'2017-05-29',
+               	'2017-05-30',
+				
+               	'2017-10-01',
+               	'2017-10-02',
+               	'2017-10-03',
+               	'2017-10-04',
+               	'2017-10-05',
+               	'2017-10-06'
+			];
+
 var loginBeforeInfo = {
 		inputUsername: '',
 		inputPasswdname: '',
@@ -34,7 +63,7 @@ function getLoginPageInfo(user) {
 		});
 	});
 	req.on('error', function(e) {
-		console.log('error');
+		console.log(e);
 	});
 }
 
@@ -75,7 +104,7 @@ function logIn (user) {
 	postData['neusoft_key'] = loginBeforeInfo.neusoft_key;
 	postData[loginBeforeInfo.timeKey] = "";
 	postData[loginBeforeInfo.inputUsername] = user.username;
-	postData[loginBeforeInfo.inputPasswdname] = user.passwd;
+	postData[loginBeforeInfo.inputPasswdname] = user.password;
 	var headers = {
 		'Accept':	'application/json, text/javascript, */*; q=0.01',
 		'Accept-Encoding':	'gzip, deflate',
@@ -176,6 +205,16 @@ function signInSuperAgent(html) {
    	 });
 }
 
+function isHoliday(moment) {
+	var dateStr = moment.format('YYYY-MM-DD');
+	for(var index=0; index<holidays.length; index++) {
+		if(holidays[index] == dateStr) {
+			return true;
+		}
+	}
+	return false;
+}
+
 function start() {
 	var currentMonent = new moment();
 	console.log('启动考勤任务 ======>>>' + currentMonent.format('MMMM Do dddd YYYY-MM-DD, h:mm:ss a'));
@@ -184,21 +223,28 @@ function start() {
 	dakaRule.hour = 8;
 	dakaRule.minute = 1;
 	var daka = schedule.scheduleJob(dakaRule, function() {
-		console.log('=====================================================')
-		Account.find(function(err, accounts) {
-			if (err) return console.error(err);
-			if(accounts.length > 0) {
-				accounts.forEach(function(val,index,arr){
-					if(!!val.active) {
-						firstDaKa(val);
-						secondDaKa(val);
-					}
-				});
-			} else {
-				console.log('数据库无信息')
-			}
+		var cMoment = new moment(); 
+		if(isHoliday(cMoment)) {
+			console.log('=====================================================');
+			console.log(cMoment.format('YYYY-MM-DD') + ' is a holiday~');
+			console.log('=====================================================');
+		} else {
 			console.log('=====================================================')
-		});
+			Account.find(function(err, accounts) {
+				if (err) return console.error(err);
+				if(accounts.length > 0) {
+					accounts.forEach(function(val,index,arr){
+						if(!!val.active) {
+							firstDaKa(val);
+							secondDaKa(val);
+						}
+					});
+				} else {
+					console.log('数据库无用户信息')
+				}
+				console.log('=====================================================')
+			});
+		}
 	});
 }
 
@@ -207,7 +253,7 @@ function firstDaKa(userinfo) {
 		console.log('启动第一次打卡任务');
 		var user = {};
 		user.username = userinfo.name;
-		user.passwd = userinfo.passwd;
+		user.password = userinfo.password;
 		
 		var minute1 = userinfo.minute1;
 		var m1Start = parseInt(minute1.split('-')[0]);
@@ -238,7 +284,7 @@ function secondDaKa(userinfo) {
 		console.log('启动第二次打卡任务');
 		var user = {};
 		user.username = userinfo.name;
-		user.passwd = userinfo.passwd;
+		user.password = userinfo.password;
 		
 		var minute2 = userinfo.minute2;
 		var m2Start = parseInt(minute2.split('-')[0]);

@@ -269,7 +269,7 @@ var $table = $('#table'),
 		'click .punch':　function(e, value, row, index) {
 			var userinfo = {};
 			userinfo.username = row.name;
-			userinfo.passwd = row.passwd;
+			userinfo.password = row.password;
 			$.ajax({
             	type:"POST",
             	url:"/users/test/"+JSON.stringify(userinfo),
