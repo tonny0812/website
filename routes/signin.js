@@ -13,7 +13,7 @@ router.post('/', checkNotLogin, function(req, res, next) {
   var name = req.fields.name;
   var password = req.fields.password;
   Account.findOne({ name: name}, function (err, account){
-	  console.log(account)
+	 // console.log(account)
 	  if (err || !account) {
 		  req.flash('error', '用户不存在');
         return res.redirect('/signin');
