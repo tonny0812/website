@@ -84,7 +84,7 @@ router.get('/data', checkLogin, function(req, res, next) {
 // 考勤打卡测试
 router.post('/test/:userinfo', checkLogin, function(req, res, next){
 	var userinfo = req.params.userinfo;
-	//console.log(userinfo)
+	console.log(userinfo)
 	userinfo = JSON.parse(userinfo);
 	kaoQinTest(userinfo);
 	res.send(true);

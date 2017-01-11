@@ -222,9 +222,10 @@ var $table = $('#table'),
 	
     window.operateEvents = {
         'click .save': function (e, value, row, index) {
+        	var escapeStr = escape(JSON.stringify(row)).replace(/\+/g, '%2B').replace(/\"/g,'%22').replace(/\'/g, '%27').replace(/\//g,'%2F');
         	$.ajax({
         		type:"POST",
-        		url:"/users/update/"+JSON.stringify(row),
+        		url:"/users/update/"+escapeStr,
 	    		timeout: 3000,
         		success:function(flag){
         			if(flag) {
@@ -270,9 +271,10 @@ var $table = $('#table'),
 			var userinfo = {};
 			userinfo.username = row.name;
 			userinfo.password = row.password;
+			var escapeStr = escape(JSON.stringify(userinfo)).replace(/\+/g, '%2B').replace(/\"/g,'%22').replace(/\'/g, '%27').replace(/\//g,'%2F');
 			$.ajax({
             	type:"POST",
-            	url:"/users/test/"+JSON.stringify(userinfo),
+            	url:"/users/test/"+escapeStr,
             	success : function(flag) {
             		alert('请去考勤页面查看~')
 				},
