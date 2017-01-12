@@ -215,12 +215,31 @@ function isHoliday(moment) {
 	return false;
 }
 
+function init() {
+	console.log('================初始化 确保服务重启打卡有效=============================')
+	Account.find(function(err, accounts) {
+		if (err) return console.error(err);
+		if(accounts.length > 0) {
+			accounts.forEach(function(val,index,arr){
+				if(!!val.active) {
+					firstDaKa(val);
+					secondDaKa(val);
+				}
+			});
+		} else {
+			console.log('数据库无用户信息')
+		}
+		console.log('==============初始化 完成=======================================')
+	});
+}
+
 function start() {
 	var currentMonent = new moment();
 	console.log('启动考勤任务 ======>>>' + currentMonent.format('MMMM Do dddd YYYY-MM-DD, h:mm:ss a'));
+	init(); // 初始化启动打卡
 	var dakaRule = new schedule.RecurrenceRule();
 	dakaRule.dayOfWeek = [1, new schedule.Range(1, 5)];
-	dakaRule.hour = 8;
+	dakaRule.hour = 0;
 	dakaRule.minute = 1;
 	var daka = schedule.scheduleJob(dakaRule, function() {
 		var cMoment = new moment(); 
