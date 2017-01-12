@@ -45,7 +45,9 @@ app.use(session({
   },
   store: new MongoStore({// 将 session 存储到 mongodb
     url: config.mongodb// mongodb 地址
-  })
+  }),
+  resave: true,
+  saveUninitialized: true
 }));
 
 //设置模板全局常量
